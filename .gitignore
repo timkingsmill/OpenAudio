@@ -14,5 +14,5 @@ install_manifest.txt
 compile_commands.json
 
 # Ignore the JUCE library directory
-libs/JUCE/
+external/JUCE/
 
