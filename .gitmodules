@@ -1,4 +1,4 @@
 [submodule "external/JUCE"]
 	path = external/JUCE
-	url = https://github.com/timkingsmill/JUCE.git
+	url = https://github.com/timkingsmill/OpenAudio.git
 	branch = master
