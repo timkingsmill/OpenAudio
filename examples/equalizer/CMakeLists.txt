@@ -11,7 +11,7 @@ project(EQUALIZER_EXAMPLE VERSION 0.0.1)
 
 
 
-find_package(JUCE CONFIG REQUIRED)  
+## find_package(JUCE CONFIG REQUIRED)  
 
 
 
