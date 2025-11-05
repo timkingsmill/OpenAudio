@@ -13,6 +13,9 @@ Makefile
 install_manifest.txt
 compile_commands.json
 
+# Ignore the installed library directory
+libs/
+
 # Ignore the JUCE library directory
 external/JUCE/
 

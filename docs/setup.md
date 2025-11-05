@@ -1,0 +1,69 @@
+# OpenAudio Setup
+
+## Configure the source code
+
+Clone the OpenAudio GitHub Repository and initialize the JUCE library submodules.
+
+```shell
+    git clone --recurse-submodules https://github.com/timkingsmill/OpenAudio.git
+```
+
+If you've already cloned the OpenAudio repository, initialize and update submodules.
+
+```shell
+    git submodule update --init --recursive
+```
+
+To update submodules to the latest commit on their tracked branch:
+
+```shell
+    git submodule update --remote
+```
+
+For more information, see the [Git Submodules Documentation](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
+
+## Prerequisites
+
+### 1. Installing The JUCE Library
+
+To install JUCE globally on your system, you'll need to tell CMake where to place the installed files.
+
+```shell
+    # Go to JUCE directory
+    cd /path/to/clone/JUCE
+
+    # Configure JUCE build with library components only and installation path.
+    cmake -B juce-install -DCMAKE_INSTALL_PREFIX=/path/to/JUCE/install
+
+    # Install the JUCE library
+    cmake --build juce-install --target install
+```
+
+For example:
+
+```shell
+    cmake -B juce-install -DCMAKE_INSTALL_PREFIX=/source/OpenAudio/libs/JUCE/install
+    cmake --build juce-install --target install
+```
+
+### 2. Consuming the JUCE library
+
+In your project which consumes JUCE, make sure the project CMakeLists.txt contains the line: `find_package(JUCE CONFIG REQUIRED)`.
+
+This will make the JUCE modules and CMake helper functions
+available for use in the rest of your build. Then, run the build like so:
+
+```shell
+    # Go to project directory
+    cd /path/to/my/project
+    # Configure build, passing the JUCE install path you used earlier
+    cmake -B cmake-build -DCMAKE_PREFIX_PATH=/path/to/JUCE/install
+```
+
+cmake -B cmake-build -DCMAKE_INSTALL_PREFIX=/source/OpenAudio/libs/JUCE/install
+
+```shell
+    # Build the project
+    cmake --build cmake-build
+
+```

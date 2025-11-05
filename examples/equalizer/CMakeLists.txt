@@ -1,35 +1,38 @@
 cmake_minimum_required(VERSION 3.22)
+
 project(EQUALIZER_EXAMPLE VERSION 0.0.1)
 
 # If you've installed JUCE somehow (via a package manager, 
 # or directly using the CMake install target),
 # you'll need to tell this project that it 
 # depends on the installed copy of JUCE. 
-# If you've included
-# JUCE directly in your source tree (perhaps as a submodule), you'll need to tell CMake to include
-# that subdirectory as part of the build. 
+find_package(JUCE CONFIG REQUIRED)  
 
+juce_add_gui_app(EQUALIZER_EXAMPLE
+    PRODUCT_NAME "Equalizer Example"
+    VERSION ${PROJECT_VERSION}
+    COMPANY_NAME "Your Company"
+)
 
+target_sources(EQUALIZER_EXAMPLE
+    PRIVATE
+        Main.cpp
+        MainComponent.cpp)
 
-## find_package(JUCE CONFIG REQUIRED)  
+target_compile_definitions(EQUALIZER_EXAMPLE
+    PRIVATE
+        # JUCE_WEB_BROWSER and JUCE_USE_CURL would be on by default, but you might not need them.
+        JUCE_WEB_BROWSER=0  # If you remove this, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_gui_app` call
+        JUCE_USE_CURL=0     # If you remove this, add `NEEDS_CURL TRUE` to the `juce_add_gui_app` call
+        JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:EQUALIZER_EXAMPLE,JUCE_PRODUCT_NAME>"
+        JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:EQUALIZER_EXAMPLE,JUCE_VERSION>")
 
+target_link_libraries(EQUALIZER_EXAMPLE
+    PRIVATE
+        # GuiAppData            # If we'd created a binary data target, we'd link to it here
+        juce::juce_gui_extra
+    PUBLIC
+        juce::juce_recommended_config_flags
+        juce::juce_recommended_lto_flags
+        juce::juce_recommended_warning_flags)
 
-
-# DUMP the JUCE_DIR variable to see where CMake is looking for JUCE
-message(STATUS "JUCE_DIR: ${JUCE_DIR}")
-message(STATUS "CMAKE_CURRENT_LIST_DIR: ${CMAKE_CURRENT_LIST_DIR}")
-message(STATUS "CMAKE_CURRENT_LIST_DIR: ${CMAKE_CURRENT_LIST_DIR}")
-message(STATUS "JUCE_MODULES_DIR: ${JUCE_MODULES_DIR}")
-message(STATUS "JUCE_CMAKE_UTILS_DIR: ${JUCE_CMAKE_UTILS_DIR}")
-message(STATUS "JUCE_BINARY_DIR: ${JUCE_BINARY_DIR}")
-message(STATUS "JUCE_INSTALL_DESTINATION: ${JUCE_INSTALL_DESTINATION}")
-message(STATUS "JUCE_TOOL_INSTALL_DIR: ${JUCE_TOOL_INSTALL_DIR}")
-message(STATUS "JUCEAIDE_PATH: ${JUCEAIDE_PATH}")
-message(STATUS "JUCE_GLOBAL_ARA_SDK_PATH: ${JUCE_GLOBAL_ARA_SDK_PATH}")
-message(STATUS "JUCE_WEBVIEW2_PACKAGE_LOCATION: ${JUCE_WEBVIEW2_PACKAGE_LOCATION}")
-message(STATUS "JUCE_VERSION: ${JUCE_VERSION}")
-message(STATUS "JUCE_BUILD_EXTRAS: ${JUCE_BUILD_EXTRAS}")
-message(STATUS "JUCE_BUILD_EXAMPLES: ${JUCE_BUILD_EXAMPLES}")
-message(STATUS "JUCE_WEBVIEW2_PACKAGE_LOCATION: ${JUCE_WEBVIEW2_PACKAGE_LOCATION}")
-
-###add_subdirectory(JUCE_SOURCE_DIR)
