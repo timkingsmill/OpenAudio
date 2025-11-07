@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 
+set(CMAKE_FOLDER examples/equalizer)
+
 project(EQUALIZER_EXAMPLE VERSION 0.0.1)
 
 # If you've installed JUCE somehow (via a package manager, 
@@ -11,16 +13,26 @@ find_package(JUCE CONFIG REQUIRED)
 juce_add_gui_app(EQUALIZER_EXAMPLE
     PRODUCT_NAME "Equalizer Example"
     VERSION ${PROJECT_VERSION}
-    COMPANY_NAME "Your Company"
+    COMPANY_NAME "Tim at OpenAudio"
 )
+
+juce_generate_juce_header(EQUALIZER_EXAMPLE)
 
 target_sources(EQUALIZER_EXAMPLE
     PRIVATE
-        Main.cpp
-        MainComponent.cpp)
+        source/Main.cpp
+        source/MainComponent.cpp
+        source/MenuComponent.cpp
+        include/MainComponent.h
+        include/MenuComponent.h )
+
+target_include_directories(EQUALIZER_EXAMPLE 
+    PRIVATE
+        include)
 
 target_compile_definitions(EQUALIZER_EXAMPLE
     PRIVATE
+        DONT_SET_USING_JUCE_NAMESPACE=1
         # JUCE_WEB_BROWSER and JUCE_USE_CURL would be on by default, but you might not need them.
         JUCE_WEB_BROWSER=0  # If you remove this, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_gui_app` call
         JUCE_USE_CURL=0     # If you remove this, add `NEEDS_CURL TRUE` to the `juce_add_gui_app` call
@@ -31,6 +43,8 @@ target_link_libraries(EQUALIZER_EXAMPLE
     PRIVATE
         # GuiAppData            # If we'd created a binary data target, we'd link to it here
         juce::juce_gui_extra
+        juce::juce_audio_devices
+        juce::juce_audio_utils
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags

@@ -1,11 +1,11 @@
 #include "MainComponent.h"
 
 //==============================================================================
-class GuiAppApplication final : public juce::JUCEApplication
+class EqualizerApplication final : public juce::JUCEApplication
 {
 public:
     //==============================================================================
-    GuiAppApplication() {}
+    EqualizerApplication() {}
 
     // We inject these as compile definitions from the CMakeLists.txt
     // If you've enabled the juce header with `juce_generate_juce_header(<thisTarget>)`
@@ -15,12 +15,12 @@ public:
     bool moreThanOneInstanceAllowed() override             { return true; }
 
     //==============================================================================
-    void initialise (const juce::String& commandLine) override
+    void initialise(const juce::String& commandLine) override
     {
         // This method is where you should put your application's initialisation code..
-        juce::ignoreUnused (commandLine);
+        juce::ignoreUnused(commandLine);
 
-        mainWindow.reset (new MainWindow (getApplicationName()));
+        mainWindow.reset(new MainWindow(getApplicationName()));
     }
 
     void shutdown() override
@@ -54,11 +54,11 @@ public:
     class MainWindow final : public juce::DocumentWindow
     {
     public:
-        explicit MainWindow (juce::String name)
-            : DocumentWindow (name,
-                              juce::Desktop::getInstance().getDefaultLookAndFeel()
-                                                          .findColour (ResizableWindow::backgroundColourId),
-                              DocumentWindow::allButtons)
+        explicit MainWindow(juce::String name)
+            : DocumentWindow(name,
+                             juce::Desktop::getInstance().getDefaultLookAndFeel()
+                                                         .findColour (ResizableWindow::backgroundColourId),
+                             DocumentWindow::allButtons)
         {
             setUsingNativeTitleBar (true);
             setContentOwned (new MainComponent(), true);
@@ -89,6 +89,8 @@ public:
         */
 
     private:
+        JUCEApplication& app = *JUCEApplication::getInstance();
+
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)
     };
 
@@ -98,4 +100,4 @@ private:
 
 //==============================================================================
 // This macro generates the main() routine that launches the app.
-START_JUCE_APPLICATION (GuiAppApplication)
+START_JUCE_APPLICATION (EqualizerApplication)

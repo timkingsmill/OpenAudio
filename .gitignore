@@ -16,6 +16,7 @@ compile_commands.json
 # Ignore the installed library directory
 libs/
 
+external/
 # Ignore the JUCE library directory
 external/JUCE/
 
