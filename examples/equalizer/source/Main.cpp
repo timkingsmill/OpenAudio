@@ -1,3 +1,5 @@
+#include "EqualizerEditor.h"
+#include "EqualizerProcessor.h"
 #include "MainComponent.h"
 
 //==============================================================================
@@ -20,14 +22,19 @@ public:
         // This method is where you should put your application's initialisation code..
         juce::ignoreUnused(commandLine);
 
-        mainWindow.reset(new MainWindow(getApplicationName()));
+        _equalizerProcessor.reset(new EqualizerProcessor());
+        _equalizerEditor.reset(new EqualizerEditor(*_equalizerProcessor));    
+        _mainWindow.reset(new MainWindow(getApplicationName(),
+                            *_equalizerEditor,
+                            *this));
     }
 
     void shutdown() override
     {
         // Add your application's shutdown code here..
-
-        mainWindow = nullptr; // (deletes our window)
+        _equalizerEditor = nullptr;
+        _equalizerProcessor = nullptr;
+        _mainWindow = nullptr; // (deletes our window)
     }
 
     //==============================================================================
@@ -54,21 +61,24 @@ public:
     class MainWindow final : public juce::DocumentWindow
     {
     public:
-        explicit MainWindow(juce::String name)
+        explicit MainWindow(const juce::String& name, juce::Component& content, JUCEApplication& application)
             : DocumentWindow(name,
                              juce::Desktop::getInstance().getDefaultLookAndFeel()
                                                          .findColour (ResizableWindow::backgroundColourId),
-                             DocumentWindow::allButtons)
+                             DocumentWindow::allButtons),
+            _application(application),
+            _content(content)
         {
             setUsingNativeTitleBar (true);
-            setContentOwned (new MainComponent(), true);
+            setContentOwned(&content, true);
 
-           #if JUCE_IOS || JUCE_ANDROID
-            setFullScreen (true);
-           #else
-            setResizable (true, true);
-            centreWithSize (getWidth(), getHeight());
-           #endif
+            #if JUCE_IOS || JUCE_ANDROID
+                setFullScreen (true);
+            #else
+                setResizable (true, true);
+                setResizeLimits(300, 250, 10000, 10000);
+                centreWithSize (getWidth(), getHeight());
+            #endif
 
             setVisible (true);
         }
@@ -89,15 +99,21 @@ public:
         */
 
     private:
-        JUCEApplication& app = *JUCEApplication::getInstance();
+        JUCEApplication& _application;
+        juce::Component& _content;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)
     };
 
 private:
-    std::unique_ptr<MainWindow> mainWindow;
+    std::unique_ptr<juce::DocumentWindow> _mainWindow;
+    std::unique_ptr<juce::Component> _equalizerEditor;
+    std::unique_ptr<EqualizerProcessor> _equalizerProcessor;
 };
 
 //==============================================================================
+
+
+
 // This macro generates the main() routine that launches the app.
 START_JUCE_APPLICATION (EqualizerApplication)

@@ -23,8 +23,12 @@ target_sources(EQUALIZER_EXAMPLE
         source/Main.cpp
         source/MainComponent.cpp
         source/MenuComponent.cpp
+        source/EqualizerEditor.cpp
+        source/EqualizerProcessor.cpp
         include/MainComponent.h
-        include/MenuComponent.h )
+        include/MenuComponent.h 
+        include/EqualizerEditor.h
+        include/EqualizerProcessor.h )
 
 target_include_directories(EQUALIZER_EXAMPLE 
     PRIVATE
