@@ -5,14 +5,17 @@
 // have called `juce_generate_juce_header(<thisTarget>)` in your CMakeLists.txt,
 // you could `#include <JuceHeader.h>` here instead, to make all your module headers visible.
 #include <JuceHeader.h>
+#include "DebugComponent.h"
 
 //==============================================================================
 /*
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class MainComponent final : public juce::Component,
-                            public juce::ChangeListener
+class MainComponent final : 
+    public juce::ApplicationCommandTarget,
+    public juce::Component,
+    public juce::MenuBarModel
 {
 public:
     //==============================================================================
@@ -23,50 +26,41 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    enum CommandIDs
+    {
+        audioSetupCommandID = 1,
+        exitAppCommandID
+    };
+
     //==============================================================================
 private:
-    void logMessage(const juce::String& m)
-    {
-        diagnosticsBox.moveCaretToEnd();
-        diagnosticsBox.insertTextAtCaret(m + juce::newLine);
-    }
+    void showDialogWindow();
 
-    void dumpDeviceInfo()
-    {
-        logMessage("--------------------------------------");
-        logMessage("Current audio device type: " + (audioDeviceManager.getCurrentDeviceTypeObject() != nullptr
-            ? audioDeviceManager.getCurrentDeviceTypeObject()->getTypeName()
-            : "<none>"));
 
-        if (juce::AudioIODevice* device = audioDeviceManager.getCurrentAudioDevice())
-        {
-            logMessage("Current audio device: " + device->getName().quoted());
-            logMessage("Sample rate: " + juce::String(device->getCurrentSampleRate()) + " Hz");
-            logMessage("Block size: " + juce::String(device->getCurrentBufferSizeSamples()) + " samples");
-            logMessage("Output Latency: " + juce::String(device->getOutputLatencyInSamples()) + " samples");
-            logMessage("Input Latency: " + juce::String(device->getInputLatencyInSamples()) + " samples");
-            logMessage("Bit depth: " + juce::String(device->getCurrentBitDepth()));
-            logMessage("Input channel names: " + device->getInputChannelNames().joinIntoString(", "));
-            //logMessage("Active input channels: " + getListOfActiveBits(device->getActiveInputChannels()));
-            logMessage("Output channel names: " + device->getOutputChannelNames().joinIntoString(", "));
-            //logMessage("Active output channels: " + getListOfActiveBits(device->getActiveOutputChannels()));
-        }
-        else
-        {
-            logMessage("No audio device open");
-        }
-    }
+    // Inherited via ApplicationCommandTarget
+    ApplicationCommandTarget* getNextCommandTarget() override;
+    void getAllCommands(juce::Array<juce::CommandID>& commands) override;
+    void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
+    bool perform(const InvocationInfo& info) override;
 
-    // Inherited via ChangeListener
-    void changeListenerCallback(juce::ChangeBroadcaster* source) override;
+    // Inherited via MenuBarModel
+    juce::StringArray getMenuBarNames() override;
+    juce::PopupMenu getMenuForIndex(int menuIndex, const juce::String& menuName) override;
+    void menuItemSelected(int menuItemID, int menuIndex) override;
+
+    // Inherited via Component
     void lookAndFeelChanged() override;
 
 private:
     //==============================================================================
-    // Your private member variables go here...
-    juce::AudioDeviceManager audioDeviceManager;
-    std::unique_ptr<juce::AudioDeviceSelectorComponent> audioSetupComp;
-    juce::TextEditor diagnosticsBox;
+    juce::ApplicationProperties _applicationProperties;
+    juce::AudioDeviceManager _audioDeviceManager;
+
+    std::unique_ptr<DebugComponent> _debugComponent;
+    std::unique_ptr<juce::MenuBarComponent> _menuBarComponent;
+
+    juce::ApplicationCommandManager _commandManager;
+    juce::Component::SafePointer<juce::DialogWindow> _dialogWindow;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

@@ -33,9 +33,9 @@ To install JUCE globally on your system, you'll need to tell CMake where to plac
     cd /path/to/clone/JUCE
 
     # Configure JUCE build with library components only and installation path.
-	cmake -B juce-install -DCMAKE_INSTALL_PREFIX=/path/to/JUCE/install
+    cmake -B juce-install -DCMAKE_INSTALL_PREFIX=/path/to/JUCE/install
 
-    # Install the JUCE library to the path specified above.
+    # Install the JUCE library
     cmake --build juce-install --target install
 ```cd
 

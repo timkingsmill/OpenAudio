@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 4.2.0)
 
 set(CMAKE_FOLDER examples/equalizer)
 
@@ -13,6 +13,8 @@ find_package(JUCE CONFIG REQUIRED)
 juce_add_gui_app(EQUALIZER_EXAMPLE
     PRODUCT_NAME "Equalizer Example"
     VERSION ${PROJECT_VERSION}
+    BUNDLE_ID "com.juce.equalizerexample"
+    COMPANY_PRODUCT_NAME "OpenAudio Equalizer Example"
     COMPANY_NAME "Tim at OpenAudio"
 )
 
@@ -20,13 +22,19 @@ juce_generate_juce_header(EQUALIZER_EXAMPLE)
 
 target_sources(EQUALIZER_EXAMPLE
     PRIVATE
+        source/AudioSettingsComponent.cpp
+        source/DebugComponent.cpp
         source/Main.cpp
         source/MainComponent.cpp
-        source/MenuComponent.cpp
+        source/MainMenuComponent.cpp
+        source/MainMenuModel.cpp
         source/EqualizerEditor.cpp
         source/EqualizerProcessor.cpp
+        include/AudioSettingsComponent.h
+        include/DebugComponent.h
+        include/MainMenuComponent.h
         include/MainComponent.h
-        include/MenuComponent.h 
+        include/MainMenuModel.h
         include/EqualizerEditor.h
         include/EqualizerProcessor.h )
 

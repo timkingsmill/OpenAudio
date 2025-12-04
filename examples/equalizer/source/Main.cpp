@@ -1,6 +1,7 @@
-#include "EqualizerEditor.h"
-#include "EqualizerProcessor.h"
 #include "MainComponent.h"
+#include "MainMenuModel.h"
+
+#include ".\..\..\..\modules\patterns\singleton.h"
 
 //==============================================================================
 class EqualizerApplication final : public juce::JUCEApplication
@@ -22,18 +23,15 @@ public:
         // This method is where you should put your application's initialisation code..
         juce::ignoreUnused(commandLine);
 
-        _equalizerProcessor.reset(new EqualizerProcessor());
-        _equalizerEditor.reset(new EqualizerEditor(*_equalizerProcessor));    
-        _mainWindow.reset(new MainWindow(getApplicationName(),
-                            *_equalizerEditor,
-                            *this));
+        _mainWindow.reset(new MainWindow(
+            getApplicationName(),
+            * this)
+        );
     }
 
     void shutdown() override
     {
-        // Add your application's shutdown code here..
-        _equalizerEditor = nullptr;
-        _equalizerProcessor = nullptr;
+        // Application's shutdown code here..
         _mainWindow = nullptr; // (deletes our window)
     }
 
@@ -57,20 +55,32 @@ public:
     /*
         This class implements the desktop window that contains an instance of
         our MainComponent class.
+
+        Note: 
+            Be careful if you override any DocumentWindow methods - the base
+            class uses a lot of them, so by overriding you might break its functionality.
+            It's best to do all your work in your content component instead, but if
+            you really have to override any DocumentWindow methods, make sure your
+            subclass also calls the superclass's method.
     */
     class MainWindow final : public juce::DocumentWindow
     {
     public:
-        explicit MainWindow(const juce::String& name, juce::Component& content, JUCEApplication& application)
+        explicit MainWindow(const juce::String& name, 
+                            JUCEApplication& application)
             : DocumentWindow(name,
                              juce::Desktop::getInstance().getDefaultLookAndFeel()
                                                          .findColour (ResizableWindow::backgroundColourId),
                              DocumentWindow::allButtons),
-            _application(application),
-            _content(content)
+            _application(application)
         {
-            setUsingNativeTitleBar (true);
-            setContentOwned(&content, true);
+            setUsingNativeTitleBar(true);
+
+            //_mainMenuModel.reset(new MainMenuModel());
+            _mainWindowContent.reset(new MainComponent());
+
+            //setMenuBar(_mainMenuModel.get());
+            setContentOwned(_mainWindowContent.get(), true);
 
             #if JUCE_IOS || JUCE_ANDROID
                 setFullScreen (true);
@@ -91,29 +101,21 @@ public:
             JUCEApplication::getInstance()->systemRequestedQuit();
         }
 
-        /* Note: Be careful if you override any DocumentWindow methods - the base
-           class uses a lot of them, so by overriding you might break its functionality.
-           It's best to do all your work in your content component instead, but if
-           you really have to override any DocumentWindow methods, make sure your
-           subclass also calls the superclass's method.
-        */
-
     private:
-        JUCEApplication& _application;
-        juce::Component& _content;
+        const JUCEApplication& _application;
+        std::unique_ptr<juce::Component> _mainWindowContent;
+        //std::unique_ptr<juce::MenuBarModel> _mainMenuModel;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)
     };
 
 private:
-    std::unique_ptr<juce::DocumentWindow> _mainWindow;
-    std::unique_ptr<juce::Component> _equalizerEditor;
-    std::unique_ptr<EqualizerProcessor> _equalizerProcessor;
+    std::shared_ptr<juce::DocumentWindow> _mainWindow;
 };
 
 //==============================================================================
 
-
-
 // This macro generates the main() routine that launches the app.
 START_JUCE_APPLICATION (EqualizerApplication)
+
+//==============================================================================
