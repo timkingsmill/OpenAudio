@@ -4,8 +4,8 @@
 # Ignore the build directory
 
 # CMake build output directories
-build/
-cmake-build*/
+/build/
+/cmake-build*/
 out/
 
 # CMake generated files

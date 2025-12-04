@@ -1,0 +1,2 @@
+function(add_openaudio_app target)
+endfunction
