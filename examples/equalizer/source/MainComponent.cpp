@@ -2,13 +2,62 @@
 #include <AudioSettingsComponent.h>
 
 //==============================================================================
+/**
+ * MainComponent constructor.
+ *
+ * Initializes application settings storage, command handling, key mappings, and UI child
+ * components used by the example:
+ *
+ * - Configures persistent user settings via a juce::PropertiesFile::Options structure
+ *   and applies them to the `_applicationProperties` member using
+ *   `setStorageParameters`.
+ * - Prepares command handling:
+ *     - Registers this component as the target that the application's command manager watches
+ *       via `setApplicationCommandManagerToWatch`.
+ *     - Makes this object the first command target with `_commandManager.setFirstCommandTarget`.
+ *     - Registers all commands that this target can perform with
+ *       `_commandManager.registerAllCommandsForTarget`.
+ *     - Installs the command manager's key mappings as a key listener so keyboard shortcuts
+ *       are delivered to the command manager.
+ * - Creates the top-level menu bar (`juce::MenuBarComponent`) and the debug panel
+ *   (`DebugComponent`), taking ownership with `std::unique_ptr::reset` and making both
+ *   visible using `addAndMakeVisible`.
+ * - Sets basic component properties: requests keyboard focus, marks the component as
+ *   opaque, and sets the initial window size.
+ *
+ * Notes:
+ * - The dialog and other UI elements expect `_audioDeviceManager` and `_applicationProperties`
+ *   to be valid members of this object.
+ * - Ownership semantics:
+ *     - `_menuBarComponent` and `_debugComponent` are managed by `std::unique_ptr`.
+ *     - `_applicationProperties` retains the storage parameters and is used elsewhere to
+ *       persist settings.
+ */
 MainComponent::MainComponent()
 {
+    _audioDeviceManager.reset(new juce::AudioDeviceManager());
+
+    // Setup the application properties storage.
     juce::PropertiesFile::Options options;
-    options.applicationName = "CapabilityInquiryDemo";
+    options.applicationName = "equalizer";
+    options.folderName = "OpenAudio";
     options.filenameSuffix = "settings";
     options.osxLibrarySubFolder = "Application Support";
     _applicationProperties.setStorageParameters(options);
+
+    juce::PropertiesFile* userSettings = _applicationProperties.getUserSettings();
+    if (userSettings != nullptr)
+    {
+        //juce::xml
+       juce::String deviceSettings =
+            userSettings->getValue("AudioDeviceSettings");
+       auto xmlState = juce::XmlDocument::parse(deviceSettings);
+
+       // Initialize the audio device manager with the saved settings.
+       // TODO: Handle the case where xmlState is nullptr or invalid.
+       _audioDeviceManager->initialise(2, 2, xmlState.get(), false);
+
+    }
 
     // Setup the command manager.
     setApplicationCommandManagerToWatch(&_commandManager);
@@ -24,8 +73,11 @@ MainComponent::MainComponent()
     _menuBarComponent.reset(new juce::MenuBarComponent(this));
     addAndMakeVisible(_menuBarComponent.get());
 
-    _debugComponent.reset(new DebugComponent(_audioDeviceManager, _applicationProperties));
-    addAndMakeVisible(_debugComponent.get());
+    _audioInputDebugView.reset(new AudioInputDebugView(*_audioDeviceManager, _applicationProperties));
+    addAndMakeVisible(_audioInputDebugView.get());
+
+    //_debugComponent.reset(new DebugComponent(*_audioDeviceManager, _applicationProperties));
+    //addAndMakeVisible(_debugComponent.get());
 
     setWantsKeyboardFocus(true);
     setOpaque(true);
@@ -35,10 +87,23 @@ MainComponent::MainComponent()
 
 MainComponent::~MainComponent()
 {
-    _menuBarComponent->setModel(nullptr);
     _commandManager.setFirstCommandTarget(nullptr);
+
+    _menuBarComponent->setModel(nullptr);
     //_mainMenuModel = nullptr;
-    _debugComponent = nullptr;
+    //_debugComponent = nullptr;
+    _audioInputDebugView = nullptr;
+
+    auto xmlState = _audioDeviceManager.get()->createStateXml();
+    if (xmlState != nullptr)
+    {
+        juce::PropertiesFile* userSettings = _applicationProperties.getUserSettings();
+        if (userSettings != nullptr)
+        {
+            userSettings->setValue("AudioDeviceSettings", xmlState->toString());
+            userSettings->saveIfNeeded();
+        }
+    }
 }
 
 //==============================================================================
@@ -60,7 +125,8 @@ void MainComponent::resized()
         _menuBarComponent->setBounds(bounds.removeFromTop(juce::LookAndFeel::getDefaultLookAndFeel()
                                     .getDefaultMenuBarHeight()));
     }
-    _debugComponent->setBounds(bounds);
+    //_debugComponent->setBounds(bounds);
+    _audioInputDebugView->setBounds(bounds);
     //_audioSettingsComponent.setBounds(bounds);
 }
 
@@ -91,7 +157,7 @@ void MainComponent::showDialogWindow()
     juce::DialogWindow::LaunchOptions options;
     
     // Create the content component to go inside the dialog window.
-    AudioSettingsComponent* audioSettingsComponent = new AudioSettingsComponent(_audioDeviceManager);
+    AudioSettingsComponent* audioSettingsComponent = new AudioSettingsComponent(*_audioDeviceManager);
     // The dialog takes ownership of the content component, so use setOwned().
     options.content.setOwned(audioSettingsComponent);
     options.dialogTitle = "Audio Settings";

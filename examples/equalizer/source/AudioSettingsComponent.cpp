@@ -2,16 +2,15 @@
 
 //==============================================================================
 AudioSettingsComponent::AudioSettingsComponent(juce::AudioDeviceManager& audioDeviceManager) :
-    _deviceManager { audioDeviceManager }
+    _audioDeviceManager{ audioDeviceManager }
 {
     setOpaque(true);
 
-    audioSetupComp.reset(new juce::AudioDeviceSelectorComponent(_deviceManager,
-        0, 256, 0, 256, 
+    audioSetupComp.reset(new juce::AudioDeviceSelectorComponent(_audioDeviceManager,
+        1, 256, 1, 256, 
         false, //true, // Disable MIDI input options
         false, //true, // Disable MIDI output selector
         true, false));
-    //audioSetupComp->setItemHeight(18);
 
     addAndMakeVisible(audioSetupComp.get());
 
@@ -24,7 +23,7 @@ AudioSettingsComponent::AudioSettingsComponent(juce::AudioDeviceManager& audioDe
     diagnosticsBox.setCaretVisible(false);
     diagnosticsBox.setPopupMenuEnabled(true);
 
-    _deviceManager.addChangeListener(this);
+    _audioDeviceManager.addChangeListener(this);
 
     logMessage("Audio device diagnostics:\n");
 
@@ -33,7 +32,7 @@ AudioSettingsComponent::AudioSettingsComponent(juce::AudioDeviceManager& audioDe
 
 AudioSettingsComponent::~AudioSettingsComponent()
 {
-    _deviceManager.removeChangeListener(this);
+    _audioDeviceManager.removeChangeListener(this);
 }
 
 //==============================================================================

@@ -35,11 +35,11 @@ private:
     void dumpDeviceInfo()
     {
         logMessage("--------------------------------------");
-        logMessage("Current audio device type: " + (_deviceManager.getCurrentDeviceTypeObject() != nullptr
-            ? _deviceManager.getCurrentDeviceTypeObject()->getTypeName()
+        logMessage("Current audio device type: " + (_audioDeviceManager.getCurrentDeviceTypeObject() != nullptr
+            ? _audioDeviceManager.getCurrentDeviceTypeObject()->getTypeName()
             : "<none>"));
 
-        if (juce::AudioIODevice* device = _deviceManager.getCurrentAudioDevice())
+        if (juce::AudioIODevice* device = _audioDeviceManager.getCurrentAudioDevice())
         {
             logMessage("Current audio device: " + device->getName().quoted());
             logMessage("Sample rate: " + juce::String(device->getCurrentSampleRate()) + " Hz");
@@ -65,7 +65,7 @@ private:
 private:
     //==============================================================================
     // Your private member variables go here...
-    juce::AudioDeviceManager& _deviceManager;
+    juce::AudioDeviceManager& _audioDeviceManager;
     std::unique_ptr<juce::AudioDeviceSelectorComponent> audioSetupComp;
     juce::TextEditor diagnosticsBox;
 

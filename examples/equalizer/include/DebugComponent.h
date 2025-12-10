@@ -18,8 +18,7 @@ class DebugComponent : public juce::Component
 
     private:
         juce::ApplicationProperties& _applicationProperties;
-        juce::AudioDeviceManager& _audiodeviceManager;
+        juce::AudioDeviceManager& _audioDeviceManager;
 
         juce::TextButton _playSoundButton{ "Play Sound" };
-
 };

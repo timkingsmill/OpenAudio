@@ -22,16 +22,22 @@ juce_generate_juce_header(EQUALIZER_EXAMPLE)
 
 target_sources(EQUALIZER_EXAMPLE
     PRIVATE
+        source/AudioInputDebugView.cpp
+        source/AudioInputListener.cpp
         source/AudioSettingsComponent.cpp
         source/DebugComponent.cpp
+        source/LiveScrollingAudioDisplay.cpp
         source/Main.cpp
         source/MainComponent.cpp
         source/MainMenuComponent.cpp
         source/MainMenuModel.cpp
         source/EqualizerEditor.cpp
         source/EqualizerProcessor.cpp
+        include/AudioInputDebugView.h
+        include/AudioInputListener.h
         include/AudioSettingsComponent.h
         include/DebugComponent.h
+        include/LiveScrollingAudioDisplay.h
         include/MainMenuComponent.h
         include/MainComponent.h
         include/MainMenuModel.h
