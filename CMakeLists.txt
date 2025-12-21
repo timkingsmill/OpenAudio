@@ -14,8 +14,9 @@ include(CMakeDependentOption)
 # Add the JUCE libaray to CMAKE_PREFIX_PATH for find_package
 set(CMAKE_PREFIX_PATH "/source/OpenAudio/libs/JUCE/install")
 
+find_package(JUCE CONFIG REQUIRED)  
+
 include(extras/build/CMake/OpenAudioUtils.cmake)
-include(extras/build/CMake/OpenAudioModuleUtils.cmake)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -26,3 +27,5 @@ endif()
 add_subdirectory(modules)
 add_subdirectory(examples)
 
+add_subdirectory(source)
+# -----------------------------------------------------------------------------------------------
