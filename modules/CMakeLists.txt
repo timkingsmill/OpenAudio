@@ -1,5 +1,7 @@
 set(CMAKE_FOLDER modules)
 
-include(../extras/build/CMake/OpenAudioModuleUtils.cmake)
-
 add_subdirectory(patterns)
+
+#openaudio_add_modules(list_of_modules
+#)
+

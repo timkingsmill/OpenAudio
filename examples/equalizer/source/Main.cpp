@@ -1,7 +1,7 @@
 #include "MainComponent.h"
 #include "MainMenuModel.h"
 
-#include ".\..\..\..\modules\patterns\singleton.h"
+//#include ".\..\..\..\modules\patterns\singleton.h"
 
 //==============================================================================
 class EqualizerApplication final : public juce::JUCEApplication
