@@ -3,48 +3,59 @@
 static int clickRadius = 4;
 static float maxDB = 24.0f;
 
-ParametricEqualiserEditor::ParametricEqualiserEditor(ParametricEqualiserProcessor& audioProcessor)
+ParametricEqualiserEditor::ParametricEqualiserEditor(ParametricEqualiserProcessor& audioProcessor,
+                                                     juce::AudioProcessorValueTreeState& vts)
     : juce::AudioProcessorEditor(&audioProcessor),
-    _audioProcessor(audioProcessor)
+    _audioProcessor(audioProcessor),
+    _audioProcessorState(vts)
 {
     _tooltipWindow->setMillisecondsBeforeTipAppears(1000);
-
     // Create edtor controls for each equalizer band
     for (size_t i = 0; i < _audioProcessor.getNumBands(); ++i)
     {
-        auto* bandEditor = _bandEditors.add(new BandEditor(i, _audioProcessor));
+        auto* bandEditor = _bandEditors.add(new BandEditor(i, _audioProcessor, _audioProcessorState));
         addAndMakeVisible(bandEditor);
     }
+    // Create the output frame control.
+    _outputGainFrame.setText(TRANS("Output"));
+    _outputGainFrame.setTextLabelPosition(juce::Justification::centred);
+    addAndMakeVisible(_outputGainFrame);
+    
+    // Create the output gain slider.   
+    addAndMakeVisible(_outputGainSlider);
+    _outputGainSlider.setTooltip(TRANS("Overall Gain"));
 
-    // Create the output level controls.
-    _outputFrame.setText(TRANS("Output"));
-    _outputFrame.setTextLabelPosition(juce::Justification::centred);
-
-    addAndMakeVisible(_outputFrame);
-    addAndMakeVisible(_outputGain);
-    _attachments.add(new juce::AudioProcessorValueTreeState::SliderAttachment(_audioProcessor.getPluginState(), ParametricEqualiserProcessor::paramOutput, _outputGain));
-    _outputGain.setTooltip(TRANS("Overall Gain"));
+    // Attach the output gain slider to the corresponding parameter.
+    _outputGainSliderAttachment.reset(new SliderAttachment(_audioProcessorState, 
+                                                           ParametricEqualiserProcessor::paramOutput, 
+                                                           _outputGainSlider));
 
     // Initialize the size of the equalizer editor.
-    auto size = getLocalBounds();
+    auto size = _audioProcessor.getSavedSize(); 
     setResizable(false, false);
     //setResizable(true, true);
-    setSize(size.getHeight(), size.getWidth());
+    setSize(size.x, size.y);
+    //setSize(size.getHeight(), size.getWidth());
     setResizeLimits(800, 450, 2990, 1800);
 
     updateFrequencyResponses();
 
-    _audioProcessor.addChangeListener(this);
-    startTimerHz(30);
+#ifdef JUCE_OPENGL
+    openGLContext.attachTo(*getTopLevelComponent());
+#endif
 
+    _audioProcessor.addChangeListener(this);
+
+    // Refresh the display at 30 Hz.
+    startTimerHz(30);
 }
 
 ParametricEqualiserEditor::~ParametricEqualiserEditor()
 {
-    //juce::PopupMenu::dismissAllActiveMenus();
-    //_audioProcessor.removeChangeListener(this);
+    juce::PopupMenu::dismissAllActiveMenus();
+    _audioProcessor.removeChangeListener(this);
 #ifdef JUCE_OPENGL
-    //openGLContext.detach();
+    openGLContext.detach();
 #endif
 }
 
@@ -56,7 +67,7 @@ void ParametricEqualiserEditor::paint(juce::Graphics& g) {
 
     g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
 
-    //g.setFont(12.0f);
+    g.setFont(12.0f);
     g.setColour(juce::Colours::silver);
     g.drawRoundedRectangle(_plotFrame.toFloat(), 5, 2);
 
@@ -130,8 +141,8 @@ void ParametricEqualiserEditor::resized() {
     }
 
     // Resize the output level control frame.
-    _outputFrame.setBounds(bandSpace.removeFromTop(bandSpace.getHeight() / 2));
-    _outputGain.setBounds(_outputFrame.getBounds().reduced(8));
+    _outputGainFrame.setBounds(bandSpace.removeFromTop(bandSpace.getHeight() / 2));
+    _outputGainSlider.setBounds(_outputGainFrame.getBounds().reduced(8));
 
     _plotFrame.reduce(3, 3);
     _brandingFrame = bandSpace.reduced(5);
@@ -194,19 +205,106 @@ void ParametricEqualiserEditor::timerCallback()
 }
 
 void ParametricEqualiserEditor::mouseDown(const juce::MouseEvent& e) {
+    if (!e.mods.isPopupMenu() || !_plotFrame.contains(e.x, e.y))
+        return;
+
+    for (int i = 0; i < _bandEditors.size(); ++i)
+    {
+        if (auto* band = _audioProcessor.getBand(size_t(i)))
+        {
+            if (std::abs(_plotFrame.getX() + getPositionForFrequency(float(int(band->frequency)) * _plotFrame.getWidth())
+                - e.position.getX()) < clickRadius)
+            {
+                _contextMenu.clear();
+                const auto& names = ParametricEqualiserProcessor::getFilterTypeNames();
+                for (int t = 0; t < names.size(); ++t)
+                    _contextMenu.addItem(t + 1, names[t], true, band->type == t);
+
+                _contextMenu.showMenuAsync(juce::PopupMenu::Options()
+                    .withTargetComponent(this)
+                    .withTargetScreenArea({ e.getScreenX(), e.getScreenY(), 1, 1 })
+                    , [this, i](int selected)
+                    {
+                        if (selected > 0)
+                            _bandEditors.getUnchecked(i)->setType(selected - 1);
+                    });
+                return;
+            }
+        }
+    }
 
 };
-void ParametricEqualiserEditor::mouseMove(const juce::MouseEvent& e) {};
-void ParametricEqualiserEditor::mouseDrag(const juce::MouseEvent& e) {};
-void ParametricEqualiserEditor::mouseDoubleClick(const juce::MouseEvent& e) {};
 
+void ParametricEqualiserEditor::mouseMove(const juce::MouseEvent& e) {
+    if (_plotFrame.contains(e.x, e.y))
+    {
+        for (int i = 0; i < _bandEditors.size(); ++i)
+        {
+            if (auto* band = _audioProcessor.getBand(size_t(i)))
+            {
+                auto pos = _plotFrame.getX() + getPositionForFrequency(float(band->frequency)) * _plotFrame.getWidth();
 
+                if (std::abs(pos - e.position.getX()) < clickRadius)
+                {
+                    if (std::abs(getPositionForGain(float(band->gain), float(_plotFrame.getY()), float(_plotFrame.getBottom()))
+                        - e.position.getY()) < clickRadius)
+                    {
+                        _draggingGain = _audioProcessorState.getParameter(_audioProcessor.getGainParamName(size_t(i)));
+                        setMouseCursor(juce::MouseCursor(juce::MouseCursor::UpDownLeftRightResizeCursor));
+                    }
+                    else
+                    {
+                        setMouseCursor(juce::MouseCursor(juce::MouseCursor::LeftRightResizeCursor));
+                    }
+
+                    if (i != _draggingBand)
+                    {
+                        _draggingBand = i;
+                        repaint(_plotFrame);
+                    }
+                    return;
+                }
+            }
+        }
+    };
+}
+
+void ParametricEqualiserEditor::mouseDrag(const juce::MouseEvent& e) {
+    if (juce::isPositiveAndBelow(_draggingBand, _bandEditors.size()))
+    {
+        auto pos = (e.position.getX() - _plotFrame.getX()) / _plotFrame.getWidth();
+        _bandEditors[_draggingBand]->setFrequency(getFrequencyForPosition(pos));
+        if (_draggingGain)
+            _bandEditors[_draggingBand]->setGain(getGainForPosition(e.position.getY(), float(_plotFrame.getY()), float(_plotFrame.getBottom())));
+    }
+};
+
+void ParametricEqualiserEditor::mouseDoubleClick(const juce::MouseEvent& e) {
+    if (_plotFrame.contains(e.x, e.y))
+    {
+        for (size_t i = 0; i < size_t(_bandEditors.size()); ++i)
+        {
+            if (auto* band = _audioProcessor.getBand(i))
+            {
+                if (std::abs(_plotFrame.getX() + getPositionForFrequency(float(band->frequency)) * _plotFrame.getWidth()
+                    - e.position.getX()) < clickRadius)
+                {
+                    if (auto* param = _audioProcessorState.getParameter(_audioProcessor.getActiveParamName(i)))
+                        param->setValueNotifyingHost(param->getValue() < 0.5f ? 1.0f : 0.0f);
+                }
+            }
+        }
+    }
+};
 
 //==========================================================
 
-ParametricEqualiserEditor::BandEditor::BandEditor(size_t index, ParametricEqualiserProcessor& processor) :
+ParametricEqualiserEditor::BandEditor::BandEditor(size_t index, 
+                                                  ParametricEqualiserProcessor& processor,
+                                                  juce::AudioProcessorValueTreeState& audioProcessorState) :
+    _index(index),
     _audioProcessor(processor),
-    _index(index)
+    _audioProcessorState(audioProcessorState)
 {
     _frame.setText(_audioProcessor.getBandName(_index));
     _frame.setTextLabelPosition(juce::Justification::centred);
@@ -214,21 +312,21 @@ ParametricEqualiserEditor::BandEditor::BandEditor(size_t index, ParametricEquali
     _frame.setColour(juce::GroupComponent::outlineColourId, _audioProcessor.getBandColour(_index));
     addAndMakeVisible(_frame);
 
-    if (auto* choiceParameter = dynamic_cast<juce::AudioParameterChoice*>(_audioProcessor.getPluginState().getParameter(_audioProcessor.getTypeParamName(index))))
+    if (auto* choiceParameter = dynamic_cast<juce::AudioParameterChoice*>(_audioProcessorState.getParameter(_audioProcessor.getTypeParamName(index))))
         _filterTypeComboBox.addItemList(choiceParameter->choices, 1);
     addAndMakeVisible(_filterTypeComboBox);
-    _boxAttachments.add(new juce::AudioProcessorValueTreeState::ComboBoxAttachment(_audioProcessor.getPluginState(), _audioProcessor.getTypeParamName(index), _filterTypeComboBox));
+    _boxAttachments.add(new juce::AudioProcessorValueTreeState::ComboBoxAttachment(_audioProcessorState, _audioProcessor.getTypeParamName(index), _filterTypeComboBox));
 
     addAndMakeVisible(_frequencySlider);
-    _attachments.add(new juce::AudioProcessorValueTreeState::SliderAttachment(_audioProcessor.getPluginState(), _audioProcessor.getFrequencyParamName(index), _frequencySlider));
+    _attachments.add(new juce::AudioProcessorValueTreeState::SliderAttachment(_audioProcessorState, _audioProcessor.getFrequencyParamName(index), _frequencySlider));
     _frequencySlider.setTooltip(TRANS("Filter's frequency"));
 
     addAndMakeVisible(_quality);
-    _attachments.add(new juce::AudioProcessorValueTreeState::SliderAttachment(_audioProcessor.getPluginState(), _audioProcessor.getQualityParamName(index), _quality));
+    _attachments.add(new juce::AudioProcessorValueTreeState::SliderAttachment(_audioProcessorState, _audioProcessor.getQualityParamName(index), _quality));
     _quality.setTooltip(TRANS("Filter's steepness (Quality)"));
 
     addAndMakeVisible(_gain);
-    _attachments.add(new juce::AudioProcessorValueTreeState::SliderAttachment(_audioProcessor.getPluginState(), _audioProcessor.getGainParamName(index), _gain));
+    _attachments.add(new juce::AudioProcessorValueTreeState::SliderAttachment(_audioProcessorState, _audioProcessor.getGainParamName(index), _gain));
     _gain.setTooltip(TRANS("Filter's gain"));
 
     _solo.setClickingTogglesState(true);
@@ -239,7 +337,7 @@ ParametricEqualiserEditor::BandEditor::BandEditor(size_t index, ParametricEquali
 
     _activate.setClickingTogglesState(true);
     _activate.setColour(juce::TextButton::buttonOnColourId, juce::Colours::green);
-    _buttonAttachments.add(new juce::AudioProcessorValueTreeState::ButtonAttachment(_audioProcessor.getPluginState(), _audioProcessor.getActiveParamName(index), _activate));
+    _buttonAttachments.add(new juce::AudioProcessorValueTreeState::ButtonAttachment(_audioProcessorState, _audioProcessor.getActiveParamName(index), _activate));
     
     addAndMakeVisible(_activate);
     _activate.setTooltip(TRANS("Activate or deactivate this filter"));
@@ -271,26 +369,6 @@ void ParametricEqualiserEditor::BandEditor::resized() {
     _gain.setBounds(localBounds);
     
 };
-
-/*** copy of resized from FreqBandEditor.cpp
-    auto bounds = getLocalBounds();
-    frame.setBounds (bounds);
-
-    bounds.reduce (10, 20);
-
-    filterType.setBounds (bounds.removeFromTop (20));
-
-    auto freqBounds = bounds.removeFromBottom (bounds.getHeight() * 2 / 3);
-    frequency.setBounds (freqBounds.withTop (freqBounds.getY() + 10));
-
-    auto buttons = freqBounds.reduced (5).withHeight (20);
-    solo.setBounds (buttons.removeFromLeft (20));
-    activate.setBounds (buttons.removeFromRight (20));
-
-    quality.setBounds (bounds.removeFromLeft (bounds.getWidth() / 2));
-    gain.setBounds (bounds);
-
-**/
 
 void ParametricEqualiserEditor::BandEditor::updateControls(ParametricEqualiserProcessor::FilterType type)
 {
@@ -364,3 +442,5 @@ void ParametricEqualiserEditor::BandEditor::buttonClicked(juce::Button* b)
         _audioProcessor.setBandSolo(_solo.getToggleState() ? int(_index) : -1);
     }
 }
+
+//==========================================================

@@ -113,7 +113,7 @@ ParametricEqualiserProcessor::ParametricEqualiserProcessor() :
         .withInput("Input", juce::AudioChannelSet::stereo(), true)
         .withOutput("Output", juce::AudioChannelSet::stereo(), true)
     ),
-    _state(*this, &_undo, "PARAMS", createParameterLayout())
+    _parameters(*this, &_undo, "PARAMS", createParameterLayout())
 {
     _frequencies.resize(300);
     for (size_t i = 0; i < _frequencies.size(); ++i) {
@@ -127,19 +127,20 @@ ParametricEqualiserProcessor::ParametricEqualiserProcessor() :
     {
         _bands[i].magnitudes.resize(_frequencies.size(), 1.0);
 
-        _state.addParameterListener(getTypeParamName(i), this);
-        _state.addParameterListener(getFrequencyParamName(i), this);
-        _state.addParameterListener(getQualityParamName(i), this);
-        _state.addParameterListener(getGainParamName(i), this);
-        _state.addParameterListener(getActiveParamName(i), this);
+        _parameters.addParameterListener(getTypeParamName(i), this);
+        _parameters.addParameterListener(getFrequencyParamName(i), this);
+        _parameters.addParameterListener(getQualityParamName(i), this);
+        _parameters.addParameterListener(getGainParamName(i), this);
+        _parameters.addParameterListener(getActiveParamName(i), this);
     }
-    _state.addParameterListener(paramOutput, this);
-    _state.state = juce::ValueTree("PROGRAM_Name");
+    _parameters.addParameterListener(paramOutput, this);
+    _parameters.state = juce::ValueTree("PROGRAM_Name");
 }
 
 ParametricEqualiserProcessor::~ParametricEqualiserProcessor() {
-    //editorBeingDeleted(getActiveEditor());
 };
+
+//==============================================================================
 
 bool ParametricEqualiserProcessor::checkForNewAnalyserData()
 {
@@ -253,11 +254,6 @@ juce::String ParametricEqualiserProcessor::getGainParamName(size_t index)
 juce::String ParametricEqualiserProcessor::getActiveParamName(size_t index)
 {
     return getBandID(index) + "-" + paramActive;
-}
-
-juce::AudioProcessorValueTreeState& ParametricEqualiserProcessor::getPluginState()
-{
-    return _state;
 }
 
 juce::StringArray ParametricEqualiserProcessor::getFilterTypeNames()
@@ -435,7 +431,7 @@ void  ParametricEqualiserProcessor::prepareToPlay(double newSampleRate, int newS
     for (size_t i = 0; i < _bands.size(); ++i) {
         updateBand(i);
     }
-    _filterChain.get<6>().setGainLinear(*_state.getRawParameterValue(paramOutput));
+    _filterChain.get<6>().setGainLinear(*_parameters.getRawParameterValue(paramOutput));
 
     updatePlots();
 
@@ -481,7 +477,7 @@ bool ParametricEqualiserProcessor::isBusesLayoutSupported(const BusesLayout& bus
 }
 
 juce::AudioProcessorEditor* ParametricEqualiserProcessor::createEditor() { 
-    return new ParametricEqualiserEditor(*this);
+    return new ParametricEqualiserEditor(*this, this->_parameters);
 }
 
 bool ParametricEqualiserProcessor::hasEditor() const {
@@ -523,26 +519,31 @@ void  ParametricEqualiserProcessor::changeProgramName(int, const juce::String&) 
 }
 
 void  ParametricEqualiserProcessor::getStateInformation(juce::MemoryBlock& destData) {
-    auto editor = _state.state.getOrCreateChildWithName(IDs::editor, nullptr);
-    editor.setProperty(IDs::sizeX, _editorSize.x, nullptr);
-    editor.setProperty(IDs::sizeY, _editorSize.y, nullptr);
+    auto state = _parameters.copyState();
 
-    juce::MemoryOutputStream stream(destData, false);
-    _state.state.writeToStream(stream);
+    auto editorProperties = state.getOrCreateChildWithName(IDs::editor, nullptr);
+    editorProperties.setProperty(IDs::sizeX, _editorSize.x, nullptr);
+    editorProperties.setProperty(IDs::sizeY, _editorSize.y, nullptr);
+
+    std::unique_ptr<juce::XmlElement> xml(state.createXml());
+    copyXmlToBinary(*xml, destData);
 }
 
 void ParametricEqualiserProcessor::setStateInformation(const void* data, int sizeInBytes) {
-    auto tree = juce::ValueTree::readFromData(data, size_t(sizeInBytes));
-    if (tree.isValid()) {
-        _state.state = tree;
-
-        auto editor = _state.state.getChildWithName(IDs::editor);
-        if (editor.isValid())
-        {
-            _editorSize.setX(editor.getProperty(IDs::sizeX, 900));
-            _editorSize.setY(editor.getProperty(IDs::sizeY, 500));
-            if (auto* thisEditor = getActiveEditor())
-                thisEditor->setSize(_editorSize.x, _editorSize.y);
+    auto xml = getXmlFromBinary(data, sizeInBytes);
+    if (xml != nullptr)
+    {
+        auto tree = juce::ValueTree::fromXml(*xml);
+        if (tree.isValid()) {
+            _parameters.state = tree;
+            auto editor = _parameters.state.getChildWithName(IDs::editor);
+            if (editor.isValid())
+            {
+                _editorSize.setX(editor.getProperty(IDs::sizeX, 900));
+                _editorSize.setY(editor.getProperty(IDs::sizeY, 500));
+                if (auto* thisEditor = getActiveEditor())
+                    thisEditor->setSize(_editorSize.x, _editorSize.y);
+            }
         }
     }
 }

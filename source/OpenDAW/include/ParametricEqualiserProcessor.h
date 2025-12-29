@@ -79,7 +79,6 @@ public:
     juce::Colour getBandColour(size_t index) const;
     int getBandIndexFromID(juce::String paramID);
     size_t getNumBands() const;
-    juce::AudioProcessorValueTreeState& getPluginState();
     const std::vector<double>& getMagnitudes();
 
     void setBandSolo(int index);
@@ -116,7 +115,7 @@ private:
     void updateBypassedStates();
     void updatePlots();
 
-    juce::AudioProcessorValueTreeState _state;
+    juce::AudioProcessorValueTreeState _parameters;
     juce::UndoManager _undo;
 
     std::vector<Band> _bands;

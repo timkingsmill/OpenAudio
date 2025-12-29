@@ -52,27 +52,6 @@ public:
      */
     MainWindowContent() {
         _audioDeviceManager.reset(new juce::AudioDeviceManager());
-        
-        // Setup the application properties storage.
-        juce::PropertiesFile::Options options;
-        options.applicationName = "equalizer";
-        options.folderName = "OpenAudio";
-        options.filenameSuffix = "settings";
-        options.osxLibrarySubFolder = "Application Support";
-        _applicationProperties.setStorageParameters(options);
-
-        juce::PropertiesFile* userSettings = _applicationProperties.getUserSettings();
-        if (userSettings != nullptr)
-        {
-            //juce::xml
-            juce::String deviceSettings =
-                userSettings->getValue("AudioDeviceSettings");
-            auto xmlState = juce::XmlDocument::parse(deviceSettings);
-
-            // Initialize the audio device manager with the saved settings.
-            // TODO: Handle the case where xmlState is nullptr or invalid.
-            _audioDeviceManager->initialise(2, 2, xmlState.get(), false);
-        }
 
         // Setup the command manager.
         setApplicationCommandManagerToWatch(&_commandManager);
@@ -100,6 +79,67 @@ public:
         _audioProcessorPlayer->setProcessor(_audioProcessor.get());
         _audioDeviceManager->addAudioCallback(_audioProcessorPlayer.get());
 
+        // Setup the application properties storage.
+        juce::PropertiesFile::Options options;
+        options.applicationName = "equalizer";
+        options.folderName = "OpenAudio";
+        options.filenameSuffix = "settings";
+        options.osxLibrarySubFolder = "Application Support";
+        _applicationProperties.setStorageParameters(options);
+
+        auto userSettings = _applicationProperties.getUserSettings();
+        if (userSettings != nullptr)
+        {
+            // Load the audio device settings from user settings.
+            /**
+             * @brief Load and apply previously saved audio device configuration.
+             *
+             * Reads the string value stored under the user-settings key
+             * "AudioDeviceSettings", attempts to parse it into an XML element via
+             * `juce::XmlDocument::parse`, and forwards the resulting `XmlElement*`
+             * to `juce::AudioDeviceManager::initialise`.
+             *
+             * Notes:
+             * - `juce::XmlDocument::parse` returns a `std::unique_ptr<juce::XmlElement>`.
+             *   The pointer may be `nullptr` if the stored string is empty or malformed.
+             * - The call `_audioDeviceManager->initialise(2, 2, xmlState.get(), false)`
+             *   will receive `nullptr` when parsing failed; `initialise` will then
+             *   use default device settings. If different behaviour is required,
+             *   add explicit null handling and error logging here.
+             * - Parameters `2, 2` represent the desired number of input and output
+             *   channels for the manager initialisation.
+             *
+             * TODO:
+             * - Validate the parsed XML contents before calling `initialise`.
+             * - Add logging for parse failures and consider a non-blocking initialisation
+             *   strategy if platform/device drivers can block during construction.
+             */
+            auto audioDeviceSettings = userSettings->getValue("AudioDeviceSettings");
+            {
+                auto xmlState = juce::XmlDocument::parse(audioDeviceSettings);
+                {
+                    // Initialize the audio device manager with the saved settings.
+                    // Note: xmlState.get() may be nullptr (parse failure or empty value).
+                    _audioDeviceManager->initialise(2, 2, xmlState.get(), false);
+                }
+            }
+
+            // Load the audio processor state using the processors setStateInformation() method.
+            auto equalizerSettings = userSettings->getValue("AudioProcessorState");
+            {
+                const auto& xmlState = juce::XmlDocument::parse(equalizerSettings);
+                if (xmlState != nullptr)
+                {
+                    auto memoryBlock = juce::MemoryBlock();
+                    {
+                        _audioProcessor->copyXmlToBinary(*xmlState, memoryBlock);
+                        _audioProcessor->setStateInformation(memoryBlock.getData(),
+                                                                static_cast<int>(memoryBlock.getSize()));
+                    }
+                }
+            }
+        }
+
         setWantsKeyboardFocus(true);
         setOpaque(true);
         setSize(800, 400);
@@ -112,16 +152,28 @@ public:
      * to reflect override of `juce::Component` destructor semantics.
      */
     ~MainWindowContent() override {
-        // Save the audio device settings to user properties.
-        auto xmlState = _audioDeviceManager.get()->createStateXml();
-        if (xmlState != nullptr)
+        juce::PropertiesFile* userSettings = _applicationProperties.getUserSettings();
+        if (userSettings != nullptr)
         {
-            juce::PropertiesFile* userSettings = _applicationProperties.getUserSettings();
-            if (userSettings != nullptr)
+            // Save the audio device settings to user properties.
+            auto xmlState = _audioDeviceManager.get()->createStateXml();
+            if (xmlState != nullptr)
             {
                 userSettings->setValue("AudioDeviceSettings", xmlState->toString());
-                userSettings->saveIfNeeded();
             }
+
+            // Save the audio processor state using the processors getStateInformation() method.
+            // This is the preferred way to save plugin state.
+            auto memoryBlock = juce::MemoryBlock();
+            {
+                _audioProcessor->getStateInformation(memoryBlock);
+                if (memoryBlock.getSize() != 0)
+                {
+                    auto xmlElement = _audioProcessor->getXmlFromBinary(static_cast<const char*>(memoryBlock.getData()), size_t(memoryBlock.getSize()));
+                    userSettings->setValue("AudioProcessorState", xmlElement->toString());
+                }
+            }
+            userSettings->saveIfNeeded();
         }
 
         _commandManager.setFirstCommandTarget(nullptr);
@@ -131,9 +183,13 @@ public:
         _audioDeviceManager->removeAudioCallback(_liveScrollingAudioVisualiser.get());
 
         _audioProcessorPlayer = nullptr;
-        _audioProcessor = nullptr;
 
-        //_parametricEqualizerEditor = nullptr;
+        // Notify the processor that its editor is being deleted.
+        _audioProcessor->editorBeingDeleted(_parametricEqualizerEditor.get());
+        // Delete the editor component.
+        _parametricEqualizerEditor = nullptr;
+        
+        _audioProcessor = nullptr;
     };
 
     /**
@@ -361,9 +417,7 @@ private:
      */
     void lookAndFeelChanged() override {};
 
-
 private:
-    //JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainWindowContent)
 
     //==============================================================================
     /**
