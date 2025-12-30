@@ -27,5 +27,5 @@ endif()
 add_subdirectory(modules)
 add_subdirectory(examples)
 
-add_subdirectory(source)
+add_subdirectory(applications)
 # -----------------------------------------------------------------------------------------------
