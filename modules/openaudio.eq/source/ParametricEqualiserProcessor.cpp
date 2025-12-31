@@ -1,5 +1,5 @@
 #include "ParametricEqualiserProcessor.h"
-#include "ParametricEqualiserEditer.h"
+#include "ParametricEqualiserEditor.h"
 
 juce::String ParametricEqualiserProcessor::paramOutput("output");
 juce::String ParametricEqualiserProcessor::paramType("type");

@@ -6,6 +6,4 @@ target_sources(OpenDAW
         AudioSettingsComponent.h
         LiveScrollingAudioVisualiser.h
         MainWindowContent.h
-        ParametricEqualiserEditer.h
-        ParametricEqualiserProcessor.h
 )

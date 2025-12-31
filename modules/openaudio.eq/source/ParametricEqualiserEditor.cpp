@@ -1,4 +1,4 @@
-#include "ParametricEqualiserEditer.h"
+#include "ParametricEqualiserEditor.h"
 
 static int clickRadius = 4;
 static float maxDB = 24.0f;
