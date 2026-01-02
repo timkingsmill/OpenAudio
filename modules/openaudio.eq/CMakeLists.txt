@@ -1,6 +1,9 @@
 project(openaudio.eq VERSION 0.1.0 LANGUAGES C CXX)
 
-add_library(openaudio.eq INTERFACE)
+add_library(openaudio.eq INTERFACE
+)
+
+#add_library(MyProject::MyLibrary ALIAS openaudio.eq)
 
 target_sources(openaudio.eq
     PUBLIC

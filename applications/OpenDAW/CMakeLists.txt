@@ -1,11 +1,15 @@
 # -----------------------------------------------------------------------------------------------
 # OpenDAW executable target.
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_FOLDER applications/OpenDAW)
 
 project(OpenDAW VERSION 0.1.0 LANGUAGES C CXX)
 
-juce_add_gui_app(OpenDAW
+# Set OpenDAW as the startup project in Visual Studio
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT OpenDAW)
+
+openaudio_add_gui_app(OpenDAW
     PRODUCT_NAME "OpenDAW"
     VERSION ${PROJECT_VERSION}
     BUNDLE_ID "com.openaudio.opendaw"
@@ -13,8 +17,6 @@ juce_add_gui_app(OpenDAW
     COMPANY_NAME "OpenAudio"
 )
 
-# Set OpenDAW as the startup project in Visual Studio
-set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT OpenDAW)
 
 # Create the JuceHeader.h for this target.
 juce_generate_juce_header(OpenDAW)
@@ -36,7 +38,16 @@ target_include_directories(OpenDAW
 add_subdirectory(include)
 
 # Add the source files for this target.
-add_subdirectory(source)
+source_group("My Source Files\\module" 
+    FILES
+        source/OpenDAW.cpp
+)
+set(MODULE_SOURCES source/OpenDAW.cpp)
+target_sources(OpenDAW
+    PRIVATE
+        ${MODULE_SOURCES}
+)
+##add_subdirectory(source)
 
 target_link_libraries(OpenDAW
     PRIVATE 
