@@ -3,7 +3,6 @@
 #include "JuceHeader.h"
 #include "AudioSettingsComponent.h"
 #include "LiveScrollingAudioVisualiser.h"
-#include "ParametricEqualiserProcessor.h"
 
 //==============================================================================
 

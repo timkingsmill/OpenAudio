@@ -73,8 +73,8 @@ add_subdirectory(include)
 # Link OpenDAW against the openaudio.eq module.
 target_link_libraries(OpenDAW
     LINK_PRIVATE 
-        openaudio.eq
-        openaudio::openaudio.core
+        openaudio::openaudio_eq
+        #openaudio::openaudio.core
 )
 
 target_link_libraries(OpenDAW 
@@ -99,7 +99,7 @@ message(STATUS "--------------------------------")
 message(STATUS "Sources for OpenDAW: ${target_sources_list}")
 message(STATUS "--------------------------------")
 
-
+#[[
 get_target_property(interface_sources_list openaudio.eq SOURCES)
 message(STATUS "--------------------------------")
 message(STATUS "Sources for openaudio.eq: ${interface_sources_list}")
@@ -113,6 +113,7 @@ endforeach()
 
 get_target_property(ExecutablePath openaudio.eq SOURCE_DIR)
 message(STATUS "Source Path for openaudio.eq library: ${ExecutablePath}")
+]]#
 
 #source_group("openaudio.eq Source Files"        
 #    FILES
