@@ -9,7 +9,7 @@ project(OpenDAW VERSION 0.1.0 LANGUAGES C CXX)
 # Set OpenDAW as the startup project in Visual Studio
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT OpenDAW)
 
-openaudio_add_gui_app(OpenDAW
+juce_add_gui_app(OpenDAW
     PRODUCT_NAME "OpenDAW"
     VERSION ${PROJECT_VERSION}
     BUNDLE_ID "com.openaudio.opendaw"
@@ -17,9 +17,24 @@ openaudio_add_gui_app(OpenDAW
     COMPANY_NAME "OpenAudio"
 )
 
-
 # Create the JuceHeader.h for this target.
 juce_generate_juce_header(OpenDAW)
+
+set( 
+    CPP_FILES
+        source/OpenDAW.cpp
+)
+
+target_sources(OpenDAW
+    PRIVATE
+        ${CPP_FILES}
+)
+
+source_group(
+    TREE "${CMAKE_CURRENT_SOURCE_DIR}/source"
+    PREFIX "Tims Source Files"
+    FILES ${CPP_FILES}
+)
 
 target_compile_definitions(OpenDAW
     PRIVATE
@@ -38,20 +53,28 @@ target_include_directories(OpenDAW
 add_subdirectory(include)
 
 # Add the source files for this target.
-source_group("My Source Files\\module" 
-    FILES
-        source/OpenDAW.cpp
-)
-set(MODULE_SOURCES source/OpenDAW.cpp)
-target_sources(OpenDAW
-    PRIVATE
-        ${MODULE_SOURCES}
-)
-##add_subdirectory(source)
+#source_group("My Source Files\\module" 
+#    FILES
+#        source/OpenDAW.cpp
+#)
 
+#set(MODULE_SOURCES source/OpenDAW.cpp)
+#target_sources(OpenDAW
+#    PRIVATE
+#        ${MODULE_SOURCES}
+#)
+#add_subdirectory(source)
+
+# Retrieve the sources into a variable named 'target_sources_list'
+#get_target_property(target_sources_list OpenDAW SOURCES)
+#message(STATUS "Sources for OpenDAW: ${target_sources_list}")
+#message(STATUS "--------------------------------")
+
+# Link OpenDAW against the openaudio.eq module.
 target_link_libraries(OpenDAW
-    PRIVATE 
+    LINK_PRIVATE 
         openaudio.eq
+        openaudio::openaudio.core
 )
 
 target_link_libraries(OpenDAW 
@@ -69,4 +92,33 @@ target_link_libraries(OpenDAW
         juce::juce_audio_basics 
         juce::juce_core
 )   
+
+# Retrieve the sources into a variable named 'target_sources_list'
+get_target_property(target_sources_list OpenDAW SOURCES)
+message(STATUS "--------------------------------")
+message(STATUS "Sources for OpenDAW: ${target_sources_list}")
+message(STATUS "--------------------------------")
+
+
+get_target_property(interface_sources_list openaudio.eq SOURCES)
+message(STATUS "--------------------------------")
+message(STATUS "Sources for openaudio.eq: ${interface_sources_list}")
+message(STATUS "--------------------------------")
+
+foreach(source IN LISTS interface_sources_list)
+    message(STATUS "Source File: ${source}")
+    get_filename_component(source_path "${source}" DIRECTORY)
+    message(STATUS "File Path: ${source_path}")
+endforeach()
+
+get_target_property(ExecutablePath openaudio.eq SOURCE_DIR)
+message(STATUS "Source Path for openaudio.eq library: ${ExecutablePath}")
+
+#source_group("openaudio.eq Source Files"        
+#    FILES
+#        interface_sources_list
+#)
+
+
+
 # -----------------------------------------------------------------------------------------------

@@ -3,7 +3,7 @@ set(CMAKE_FOLDER applications/OpenPluginHost)
 
 project(OpenPluginHost VERSION 0.1.0 LANGUAGES C CXX)
 
-openaudio_add_gui_app(OpenPluginHost    
+juce_add_gui_app(OpenPluginHost    
     PRODUCT_NAME "OpenPluginHost"
     VERSION ${PROJECT_VERSION}
     BUNDLE_ID "com.openaudio.openpluginhost"
@@ -26,12 +26,26 @@ target_compile_definitions(OpenPluginHost
 
 target_include_directories(OpenPluginHost 
     PRIVATE
-        include)
+        include
+)
 
-# Add the include files for this target.
-add_subdirectory(include)
-# Add the source files for this target.
-add_subdirectory(source)
+target_sources(OpenPluginHost
+    PRIVATE
+        Analyser.h
+        CustomStandaloneApp.h
+        CustomStandaloneApp.cpp
+        CustomStandaloneMain.cpp
+        CustomStandalone.cpp
+        CustomStandaloneFilterWindow.h 
+        PluginEditor.cpp
+        PluginEditor.h
+        PluginProcessor.cpp
+        PluginProcessor.h
+        ParametricEqualiserEditor.h
+        ParametricEqualiserEditor.cpp
+        ParametricEqualiserProcessor.h  
+        ParametricEqualiserProcessor.cpp
+)
 
 #target_link_libraries(OpenPluginHost 
 #    PRIVATE 
@@ -51,6 +65,7 @@ target_link_libraries(OpenPluginHost
         juce::juce_audio_utils 
         juce::juce_dsp 
         juce::juce_audio_basics 
+        juce::juce_audio_plugin_client
         juce::juce_core
 )   
 
