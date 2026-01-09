@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\source\OpenAudio\juce-install\CMakeFiles\d859abf812cc2b0ba4f5fee1d59bae3d\OpenEQ_resources.rc.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\source\OpenAudio\source\applications\OpenEQ\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="C:\source\OpenAudio\juce-install\source\applications\OpenEQ\OpenEQ_artefacts\JuceLibraryCode\OpenEQ_resources.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{7B4F4E09-20E8-3797-AD8A-E01E5F164C82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{EA6A8AD5-DCAC-3645-8EE5-618E9CE1FF0B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

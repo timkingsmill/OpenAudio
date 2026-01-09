@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\source\OpenAudio\juce-install\CMakeFiles\b4a3d9c7f94e613e869f2413353d21ff\OpenLookAndFeel_resources.rc.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\source\OpenAudio\source\applications\OpenLookAndFeel\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="C:\source\OpenAudio\juce-install\source\applications\OpenLookAndFeel\OpenLookAndFeel_artefacts\JuceLibraryCode\OpenLookAndFeel_resources.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{7B4F4E09-20E8-3797-AD8A-E01E5F164C82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{EA6A8AD5-DCAC-3645-8EE5-618E9CE1FF0B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

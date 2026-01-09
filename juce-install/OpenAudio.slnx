@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Solution>
+	<Configurations>
+		<BuildType Name="Debug"/>
+		<BuildType Name="Release"/>
+		<BuildType Name="MinSizeRel"/>
+		<BuildType Name="RelWithDebInfo"/>
+		<Platform Name="x64"/>
+	</Configurations>
+	<Folder Name="/CMakePredefinedTargets/">
+		<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="0038ea63-40c8-3180-9779-049b5480516b" DefaultStartup="true">
+			<BuildDependency Project="examples/equalizer/EQUALIZER_EXAMPLE.vcxproj"/>
+			<BuildDependency Project="examples/equalizer/EQUALIZER_EXAMPLE_rc_lib.vcxproj"/>
+			<BuildDependency Project="source/applications/OpenDAW/OpenDAW.vcxproj"/>
+			<BuildDependency Project="source/applications/OpenDAW/OpenDAW_rc_lib.vcxproj"/>
+			<BuildDependency Project="source/applications/OpenEQ/OpenEQ.vcxproj"/>
+			<BuildDependency Project="source/applications/OpenEQ/OpenEQ_rc_lib.vcxproj"/>
+			<BuildDependency Project="source/applications/OpenLookAndFeel/OpenLookAndFeel.vcxproj"/>
+			<BuildDependency Project="source/applications/OpenLookAndFeel/OpenLookAndFeel_rc_lib.vcxproj"/>
+			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+			<Build Solution="Debug|*" Project="false"/>
+			<Build Solution="Release|*" Project="false"/>
+			<Build Solution="MinSizeRel|*" Project="false"/>
+			<Build Solution="RelWithDebInfo|*" Project="false"/>
+		</Project>
+		<Project Path="ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="f06b1c64-1207-3e84-a44d-d1aa644547e9"/>
+	</Folder>
+	<Folder Name="/applications/"/>
+	<Folder Name="/applications/OpenDAW/">
+		<Project Path="source/applications/OpenDAW/OpenDAW.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="7aff483a-f5a8-3392-bd73-2bd10ce5a381">
+			<BuildDependency Project="source/applications/OpenDAW/OpenDAW_rc_lib.vcxproj"/>
+			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		</Project>
+		<Project Path="source/applications/OpenDAW/OpenDAW_rc_lib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="af5074a4-2ce4-3e77-8d3f-d38ff5392be6">
+			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		</Project>
+	</Folder>
+	<Folder Name="/applications/OpenEQ/">
+		<Project Path="source/applications/OpenEQ/OpenEQ.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="5b74fe08-240d-3e0a-b3b3-4cbeac789e45">
+			<BuildDependency Project="source/applications/OpenEQ/OpenEQ_rc_lib.vcxproj"/>
+			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		</Project>
+		<Project Path="source/applications/OpenEQ/OpenEQ_rc_lib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="a6e0b354-12ff-3bc1-b076-c35955b3086d">
+			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		</Project>
+	</Folder>
+	<Folder Name="/applications/OpenLookAndFeel/">
+		<Project Path="source/applications/OpenLookAndFeel/OpenLookAndFeel.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="d7bb8d67-800b-3311-8710-542320d350c8">
+			<BuildDependency Project="source/applications/OpenLookAndFeel/OpenLookAndFeel_rc_lib.vcxproj"/>
+			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		</Project>
+		<Project Path="source/applications/OpenLookAndFeel/OpenLookAndFeel_rc_lib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="4f2068ae-b796-3ec6-b281-dcd7616cdb9d">
+			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		</Project>
+	</Folder>
+	<Folder Name="/examples/"/>
+	<Folder Name="/examples/equalizer/">
+		<Project Path="examples/equalizer/EQUALIZER_EXAMPLE.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="1df87e71-6cd8-3fdc-8661-f6a098c2af55">
+			<BuildDependency Project="examples/equalizer/EQUALIZER_EXAMPLE_rc_lib.vcxproj"/>
+			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		</Project>
+		<Project Path="examples/equalizer/EQUALIZER_EXAMPLE_rc_lib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="e96205cf-0813-33a3-b487-f8a840062e96">
+			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		</Project>
+	</Folder>
+</Solution>

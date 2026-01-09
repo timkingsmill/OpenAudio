@@ -1,4 +1,4 @@
-#ifdef OPENAUDIO_EQ_H_INCLUDED
+#ifdef OPENAUDIO_LOOKANDFEEL_H_INCLUDED
     /* 
     When you add this cpp file to your project, you mustn't include it in a file where you've
     already included any other headers - just put it inside a file on its own, possibly with your config
@@ -8,7 +8,6 @@
     #error "Incorrect use of OpenAudio module cpp file"
 #endif
 
-#include "openaudio_eq.h"
+#include "openaudio_lookandfeel.h"
 
-#include "eq/ParametricEqualiserEditor.cpp"   
-#include "eq/ParametricEqualiserProcessor.cpp"
+#include "lookandfeel/openaudio_LookAndFeel.cpp"

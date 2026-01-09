@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Solution>
+	<Configurations>
+		<BuildType Name="Debug"/>
+		<BuildType Name="Release"/>
+		<BuildType Name="MinSizeRel"/>
+		<BuildType Name="RelWithDebInfo"/>
+		<Platform Name="x64"/>
+	</Configurations>
+	<Folder Name="/CMakePredefinedTargets/">
+		<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="0038ea63-40c8-3180-9779-049b5480516b">
+			<BuildDependency Project="OpenDAW.vcxproj"/>
+			<BuildDependency Project="OpenDAW_rc_lib.vcxproj"/>
+			<BuildDependency Project="../../../ZERO_CHECK.vcxproj"/>
+			<Build Solution="Debug|*" Project="false"/>
+			<Build Solution="Release|*" Project="false"/>
+			<Build Solution="MinSizeRel|*" Project="false"/>
+			<Build Solution="RelWithDebInfo|*" Project="false"/>
+		</Project>
+		<Project Path="../../../ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="f06b1c64-1207-3e84-a44d-d1aa644547e9"/>
+	</Folder>
+	<Folder Name="/applications/"/>
+	<Folder Name="/applications/OpenDAW/">
+		<Project Path="OpenDAW.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="7aff483a-f5a8-3392-bd73-2bd10ce5a381" DefaultStartup="true">
+			<BuildDependency Project="OpenDAW_rc_lib.vcxproj"/>
+			<BuildDependency Project="../../../ZERO_CHECK.vcxproj"/>
+		</Project>
+		<Project Path="OpenDAW_rc_lib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="af5074a4-2ce4-3e77-8d3f-d38ff5392be6">
+			<BuildDependency Project="../../../ZERO_CHECK.vcxproj"/>
+		</Project>
+	</Folder>
+</Solution>
