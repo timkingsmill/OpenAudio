@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 4.2.0)
 
-set(CMAKE_FOLDER examples/equalizer)
+set(CMAKE_FOLDER OpenAudio/examples/equalizer)
 
 project(EQUALIZER_EXAMPLE VERSION 0.0.1)
 

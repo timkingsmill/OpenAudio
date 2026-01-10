@@ -1,8 +1,8 @@
 include_guard(GLOBAL)
-cmake_minimum_required(VERSION 3.22)
+
+cmake_minimum_required(VERSION 4.2.0)
 
 include("${JUCE_CMAKE_UTILS_DIR}/JUCEModuleSupport.cmake")
-
 
 function(openaudio_add_modules)
     openaudio_add_module(

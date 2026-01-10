@@ -26,9 +26,6 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
     message(FATAL_ERROR "In-source builds not allowed. Please create a separate build directory and run CMake from there.")
 endif()
 
-add_subdirectory(modules)
-add_subdirectory(examples)
-
 add_subdirectory(source)
 
 # -----------------------------------------------------------------------------------------------
