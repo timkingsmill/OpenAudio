@@ -34,7 +34,14 @@ target_sources(OpenEQPlugin
     PRIVATE
         OpenEQPlugin.cpp
 )
-    
+
+if(JUCE_ASIO_SUPPORT)
+    message(STATUS "Enabling ASIO support for OpenEQPlugin")
+    message(STATUS "ASIO_SDK_DIR is set to: ${ASIO_SDK_DIR}")
+    target_compile_definitions(OpenEQPlugin PUBLIC JUCE_ASIO=1)
+    target_include_directories(OpenEQPlugin PUBLIC "${ASIO_SDK_DIR}")
+endif()
+
 target_compile_definitions(OpenEQPlugin
     PUBLIC
         # JUCE_WEB_BROWSER and JUCE_USE_CURL would be on by default, but you might not need them.
@@ -45,13 +52,22 @@ target_compile_definitions(OpenEQPlugin
 
 target_link_libraries(OpenEQPlugin
     PRIVATE
-        # AudioPluginData           # If we'd created a binary data target, we'd link to it here
         openaudio::openaudio_eq
-        juce::juce_audio_utils
+)       
+
+target_link_libraries(OpenEQPlugin
+    PRIVATE 
+        juce::juce_audio_utils 
+        juce::juce_audio_devices
+        juce::juce_audio_basics 
+        juce::juce_audio_plugin_client
+        juce::juce_core
+        juce::juce_dsp 
+        juce::juce_gui_extra 
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags
-)       
+)
 
 

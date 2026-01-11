@@ -19,7 +19,6 @@ compile_commands.json
 
 # Ignore the installed library directory
 /libs/JUCE/
-/libs/ASIOSDK
 
 external/
 # Ignore the JUCE library directory

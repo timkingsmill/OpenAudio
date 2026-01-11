@@ -16,15 +16,34 @@ include(CMakeDependentOption)
 # Add the JUCE libaray to CMAKE_PREFIX_PATH for find_package
 set(CMAKE_PREFIX_PATH "/source/OpenAudio/libs/JUCE/install")
 
+#set(
+#    JUCE_ASIO_SUPPORT TRUE
+#    CACHE BOOL "Enable ASIO support in JUCE"
+#)
+
 find_package(JUCE CONFIG REQUIRED)  
 
 #include(extras/build/CMake/OpenAudioUtils.cmake)
 #include(external/extras/build/CMake/CMakeUtils.cmake)
 
-
 if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
     message(FATAL_ERROR "In-source builds not allowed. Please create a separate build directory and run CMake from there.")
 endif()
+
+# Configure ASIO SDK path
+set(ASIO_SDK_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/ASIOSDK/common")
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/libs/ASIOSDK/common")
+    if (WIN32)
+        message(STATUS "ASIO SDK found at ${ASIO_SDK_DIR}")
+        set(ASIO_SDK_PATH "${ASIO_SDK_DIR}" CACHE PATH "Path to the ASIO SDK")
+        set(JUCE_ASIO_SUPPORT TRUE CACHE BOOL "Enable ASIO support in JUCE")
+    endif()
+else()
+    message(WARNING "ASIO SDK not found in ${ASIO_SDK_DIR}. ASIO support will be disabled.")
+    set(ASIO_SDK_PATH "" CACHE PATH "Path to the ASIO SDK")
+endif() 
+
+# -----------------------------------------------------------------------------------------------
 
 add_subdirectory(source)
 
