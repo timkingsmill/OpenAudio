@@ -9,12 +9,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Disable compiler-specific extensions by default
 set(CMAKE_CXX_EXTENSIONS OFF) 
 
-project(OpenAudio VERSION 0.1.0 LANGUAGES C CXX)
+project(EvilAudio VERSION 0.1.0 LANGUAGES C CXX)
 
 include(CMakeDependentOption)
 
 # Add the JUCE libaray to CMAKE_PREFIX_PATH for find_package
-set(CMAKE_PREFIX_PATH "/source/OpenAudio/libs/JUCE/install")
+set(CMAKE_PREFIX_PATH "/source/EvilAudio/libs/JUCE/install")
 
 #set(
 #    JUCE_ASIO_SUPPORT TRUE
@@ -23,7 +23,7 @@ set(CMAKE_PREFIX_PATH "/source/OpenAudio/libs/JUCE/install")
 
 find_package(JUCE CONFIG REQUIRED)  
 
-#include(extras/build/CMake/OpenAudioUtils.cmake)
+#include(extras/build/CMake/EvilAudioUtils.cmake)
 #include(external/extras/build/CMake/CMakeUtils.cmake)
 
 if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)

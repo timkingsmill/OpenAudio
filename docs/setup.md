@@ -1,14 +1,14 @@
-# OpenAudio Setup
+# EvilAudio Setup
 
 ## Configure the source code
 
-Clone the OpenAudio GitHub Repository and initialize the JUCE library submodules.
+Clone the EvilAudio GitHub Repository and initialize the JUCE library submodules.
 
 ```shell
-    git clone --recurse-submodules https://github.com/timkingsmill/OpenAudio.git
+    git clone --recurse-submodules https://github.com/timkingsmill/EvilAudio.git
 ```
 
-If you've already cloned the OpenAudio repository, initialize and update submodules.
+If you've already cloned the EvilAudio repository, initialize and update submodules.
 
 ```shell
     git submodule update --init --recursive
@@ -42,7 +42,7 @@ To install JUCE globally on your system, you'll need to tell CMake where to plac
 For example:
 
 ```shell
-    cmake -B juce-install -DCMAKE_INSTALL_PREFIX=/source/OpenAudio/libs/JUCE/install
+    cmake -B juce-install -DCMAKE_INSTALL_PREFIX=/source/EvilAudio/libs/JUCE/install
     cmake --build juce-install --target install
 ```
 
@@ -60,7 +60,7 @@ available for use in the rest of your build. Then, run the build like so:
     cmake -B cmake-build -DCMAKE_PREFIX_PATH=/path/to/JUCE/install
 ```
 
-cmake -B cmake-build -DCMAKE_INSTALL_PREFIX=/source/OpenAudio/libs/JUCE/install
+cmake -B cmake-build -DCMAKE_INSTALL_PREFIX=/source/EvilAudio/libs/JUCE/install
 
 ```shell
     # Build the project

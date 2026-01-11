@@ -9,10 +9,10 @@ message(STATUS "CMake Juce Utilities File: ${cmake_juce_utils}")
 include("${cmake_juce_utils}")
 
 juce_add_modules(
-    ALIAS_NAMESPACE openaudio
-    openaudio_core
-    openaudio_eq
-    openaudio_lookandfeel
+    ALIAS_NAMESPACE evilaudio
+    evilaudio_core
+    evilaudio_eq
+    evilaudio_lookandfeel
 )
 
 

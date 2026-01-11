@@ -40,7 +40,7 @@ MainComponent::MainComponent()
     // Setup the application properties storage.
     juce::PropertiesFile::Options options;
     options.applicationName = "equalizer";
-    options.folderName = "OpenAudio";
+    options.folderName = "EvilAudio";
     options.filenameSuffix = "settings";
     options.osxLibrarySubFolder = "Application Support";
     _applicationProperties.setStorageParameters(options);

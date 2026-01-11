@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 4.2.0)
 
-set(CMAKE_FOLDER OpenAudio/examples/equalizer)
+set(CMAKE_FOLDER EvilAudio/examples/equalizer)
 
 project(EQUALIZER_EXAMPLE VERSION 0.0.1)
 
@@ -13,9 +13,9 @@ project(EQUALIZER_EXAMPLE VERSION 0.0.1)
 juce_add_gui_app(EQUALIZER_EXAMPLE
     PRODUCT_NAME "Equalizer Example"
     VERSION ${PROJECT_VERSION}
-    BUNDLE_ID "com.juce.equalizerexample"
-    COMPANY_PRODUCT_NAME "OpenAudio Equalizer Example"
-    COMPANY_NAME "Tim at OpenAudio"
+    BUNDLE_ID "com.evilaudio.equalizerexample"
+    COMPANY_PRODUCT_NAME "EvilAudio Equalizer Example"
+    COMPANY_NAME "Tim at EvilAudio"
 )
 
 juce_generate_juce_header(EQUALIZER_EXAMPLE)

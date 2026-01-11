@@ -5,8 +5,8 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_subdirectory(modules)
 add_subdirectory(examples/equalizer)
-add_subdirectory(plugins/OpenEQPlugin)
+add_subdirectory(plugins/EvilEQPlugin)
 
-add_subdirectory(applications/OpenDAW)
-add_subdirectory(applications/OpenEQ)
-add_subdirectory(applications/OpenLookAndFeel)
+add_subdirectory(applications/EvilDAW)
+add_subdirectory(applications/EvilEQ)
+add_subdirectory(applications/EvilLookAndFeel)
